@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit {{ station_name }}{% endblock %}
+
+{% block content %}
+
+<header style="text-align: center; padding: 0px;">
+    <a href="{{ url_for('index') }}" style="display: inline-block; padding: 10px 20px; background-color: blue; color: white; border-radius: 5px; text-decoration: none; font-size: 16px;">Home</a>
+</header>
+
+<style>
+    .edit-container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+        margin-top: 0;
+        font-size: 24px;
+    }
+    .form-group {
+        margin-bottom: 15px;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+    }
+    .form-group input {
+        width: calc(100% - 22px);
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+    .sensor-group {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 10px;
+        background-color: #f9f9f9;
+    }
+    .sensor-group input {
+        margin-right: 10px;
+        flex: 1;
+    }
+    .sensor-group button {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 8px 12px;
+        cursor: pointer;
+    }
+    .sensor-group button:hover {
+        background-color: #c82333;
+    }
+    .platform-container {
+        margin-bottom: 20px;
+    }
+    .platform-container fieldset {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 10px;
+        background-color: #f4f4f4;
+    }
+    .platform-container legend {
+        font-size: 18px;
+        font-weight: bold;
+    }
+    .button-group {
+        margin: 20px 0;
+        text-align: center;
+    }
+    .button-group button {
+        padding: 10px 20px;
+        border: none;
+        background-color: #007bff;
+        color: white;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-right: 10px;
+    }
+    .button-group button:hover {
+        background-color: #0056b3;
+    }
+    .remove-button {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 8px 12px;
+        cursor: pointer;
+    }
+    .remove-button:hover {
+        background-color: #c82333;
+    }
+    .add-platform-container {
+        text-align: center;
+        margin-top: 20px;
+    }
+    .add-platform-container button {
+        padding: 10px 20px;
+        border: none;
+        background-color: green;
+        color: white;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .add-platform-container button:hover {
+        background-color: darkgreen;
+    }
+</style>
+
+<div class="edit-container">
+    <header>
+        <h1>Edit Station: {{ station_name }}</h1>
+    </header>
+
+    <form method="post">
+        <div class="form-group">
+            <label for="name">Station Name:</label>
+            <input type="text" id="name" name="name" value="{{ station_name }}" required>
+        </div>
+
+        <div id="platforms-container">
+            {% for platform in platforms %}
+            <div class="platform-container" data-platform-id="{{ platform.id }}">
+                <fieldset>
+                    <legend>Platform: {{ platform.name }}</legend>
+                    <div class="form-group">
+                        <label for="platform-name-{{ platform.id }}">Platform Name:</label>
+                        <input type="text" id="platform-name-{{ platform.id }}" name="platform-name-{{ platform.id }}" value="{{ platform.name }}" required>
+                    </div>
+
+                    <div class="sensor-group-container">
+                        {% for sensor in platform.sensors %}
+                        <div class="sensor-group" data-sensor-id="{{ sensor.id }}">
+                            <input type="text" name="sensor-name-{{ platform.id }}[]" value="{{ sensor.name }}" placeholder="Sensor Name" required>
+                            <input type="text" name="sensor-ip-{{ platform.id }}[]" value="{{ sensor.ip }}" placeholder="IP" required>
+                            <input type="number" name="sensor-port-{{ platform.id }}[]" value="{{ sensor.port }}" placeholder="Port" required>
+                            <button type="button" class="remove-button" onclick="removeSensor(this)">Remove Sensor</button>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="add-sensor-button" onclick="addSensor(this)">Add Sensor</button>
+                        <button type="button" class="remove-button" onclick="removePlatform(this)">Remove Platform</button>
+                    </div>
+                </fieldset>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="add-platform-container">
+            <button type="button" onclick="addPlatform()">Add Platform</button>
+        </div>
+
+        <div class="button-group">
+            <button type="submit">Save Changes</button>
+        </div>
+    </form>
+
+    <script>
+        function removePlatform(button) {
+            if (confirm('Are you sure you want to remove this platform?')) {
+                const platformContainer = button.closest('.platform-container');
+                platformContainer.remove();
+                updatePlatformIndices();
+            }
+        }
+
+        function removeSensor(button) {
+            if (confirm('Are you sure you want to remove this sensor?')) {
+                const sensorGroup = button.closest('.sensor-group');
+                sensorGroup.remove();
+            }
+        }
+
+        function addSensor(button) {
+            const platformContainer = button.closest('.platform-container');
+            const platformId = platformContainer.dataset.platformId;
+            const sensorGroupContainer = platformContainer.querySelector('.sensor-group-container');
+            const newSensorGroup = document.createElement('div');
+            newSensorGroup.classList.add('sensor-group');
+            newSensorGroup.innerHTML = `
+                <input type="text" name="sensor-name-${platformId}[]" placeholder="Sensor Name" required>
+                <input type="text" name="sensor-ip-${platformId}[]" placeholder="IP" required>
+                <input type="number" name="sensor-port-${platformId}[]" placeholder="Port" required>
+                <button type="button" class="remove-button" onclick="removeSensor(this)">Remove Sensor</button>
+            `;
+            sensorGroupContainer.appendChild(newSensorGroup);
+        }
+
+        function addPlatform() {
+            const platformsContainer = document.getElementById('platforms-container');
+            const platformId = Date.now(); // Use timestamp as unique ID for new platform
+            const newPlatformContainer = document.createElement('div');
+            newPlatformContainer.classList.add('platform-container');
+            newPlatformContainer.dataset.platformId = platformId;
+            newPlatformContainer.innerHTML = `
+                <fieldset>
+                    <legend>Platform: New Platform</legend>
+                    <div class="form-group">
+                        <label for="platform-name-${platformId}">Platform Name:</label>
+                        <input type="text" id="platform-name-${platformId}" name="platform-name-${platformId}" placeholder="Platform Name" required>
+                    </div>
+                    <div class="sensor-group-container"></div>
+                    <div class="button-group">
+                        <button type="button" class="add-sensor-button" onclick="addSensor(this)">Add Sensor</button>
+                        <button type="button" class="remove-button" onclick="removePlatform(this)">Remove Platform</button>
+                    </div>
+                </fieldset>
+            `;
+            platformsContainer.appendChild(newPlatformContainer);
+        }
+
+        function updatePlatformIndices() {
+            const platformContainers = document.querySelectorAll('.platform-container');
+            platformContainers.forEach((container, index) => {
+                container.dataset.platformId = index + 1; // Simple increment for IDs
+                container.querySelectorAll('input[name^="platform-name-"]').forEach(input => {
+                    input.id = `platform-name-${index + 1}`;
+                    input.name = `platform-name-${index + 1}`;
+                });
+                container.querySelectorAll('.sensor-group').forEach((sensorGroup, sensorIndex) => {
+                    sensorGroup.dataset.sensorId = sensorIndex + 1;
+                    sensorGroup.querySelectorAll('input[name^="sensor-name-"]').forEach(input => {
+                        input.name = `sensor-name-${index + 1}[]`;
+                    });
+                });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updatePlatformIndices();
+        });
+    </script>
+</div>
+
+{% endblock %}
+

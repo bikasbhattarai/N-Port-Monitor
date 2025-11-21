@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}Add New Station{% endblock %}
+
+{% block content %}
+
+<header style="text-align: center; padding: 0px;">
+    <a href="{{ url_for('index') }}" class="exit-button">EXIT</a>
+</header>
+
+<div class="add-container">
+    <h2>Add a New Station</h2>
+    <form method="post" id="station-form">
+        <div class="form-group">
+            <label for="name">Station Name:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+
+        <div id="platforms-container">
+            <div class="platform-container" data-platform-index="0">
+                <fieldset>
+                    <legend>Platform: New Platform</legend>
+                    <div class="form-group">
+                        <label>Platform Name:</label>
+                        <input type="text" name="platform-name[]" placeholder="Platform Name" required>
+                    </div>
+
+                    <div class="sensor-group-container">
+                        <div class="sensor-group" data-sensor-index="0">
+                            <input type="text" name="sensor-name-0[]" placeholder="Sensor Name" required>
+                            <input type="text" name="sensor-ip-0[]" placeholder="IP" required>
+                            <input type="number" name="sensor-port-0[]" placeholder="Port" required>
+                            <button type="button" class="remove-button" onclick="removeSensor(this)">Remove Sensor</button>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="add-sensor-button" onclick="addSensor(this)">Add Sensor</button>
+                        <button type="button" class="remove-button" onclick="removePlatform(this)">Remove Platform</button>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+
+        <div class="add-platform-container">
+            <button type="button" onclick="addPlatform()">Add Platform</button>
+        </div>
+
+        <div class="button-group">
+            <button type="submit">Create Station</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    let platformIndex = 0;
+
+    function updateIndices() {
+        document.querySelectorAll('.platform-container').forEach((platform, index) => {
+            platform.dataset.platformIndex = index;
+            platform.querySelectorAll('.sensor-group').forEach((sensor, sensorIndex) => {
+                sensor.dataset.sensorIndex = sensorIndex;
+                sensor.querySelector('input[name^="sensor-name-"]').setAttribute('name', `sensor-name-${index}[]`);
+                sensor.querySelector('input[name^="sensor-ip-"]').setAttribute('name', `sensor-ip-${index}[]`);
+                sensor.querySelector('input[name^="sensor-port-"]').setAttribute('name', `sensor-port-${index}[]`);
+            });
+        });
+    }
+
+    function removePlatform(button) {
+        const platformContainer = button.closest('.platform-container');
+        platformContainer.remove();
+        updateIndices();
+    }
+
+    function removeSensor(button) {
+        const sensorGroup = button.closest('.sensor-group');
+        sensorGroup.remove();
+        updateIndices();
+    }
+
+    function addSensor(button) {
+        const platformContainer = button.closest('.platform-container');
+        platformIndex = platformContainer.dataset.platformIndex;
+        const sensorGroupContainer = platformContainer.querySelector('.sensor-group-container');
+        const newSensorIndex = sensorGroupContainer.querySelectorAll('.sensor-group').length;
+        const newSensorGroup = document.createElement('div');
+        newSensorGroup.classList.add('sensor-group');
+        newSensorGroup.dataset.sensorIndex = newSensorIndex;
+        newSensorGroup.innerHTML = `
+            <input type="text" name="sensor-name-${platformIndex}[]" placeholder="Sensor Name" required>
+            <input type="text" name="sensor-ip-${platformIndex}[]" placeholder="IP" required>
+            <input type="number" name="sensor-port-${platformIndex}[]" placeholder="Port" required>
+            <button type="button" class="remove-button" onclick="removeSensor(this)">Remove Sensor</button>
+        `;
+        sensorGroupContainer.appendChild(newSensorGroup);
+        updateIndices();
+    }
+
+    function addPlatform() {
+        const platformsContainer = document.getElementById('platforms-container');
+        platformIndex = platformsContainer.children.length;
+        const newPlatformContainer = document.createElement('div');
+        newPlatformContainer.classList.add('platform-container');
+        newPlatformContainer.dataset.platformIndex = platformIndex;
+        newPlatformContainer.innerHTML = `
+            <fieldset>
+                <legend>Platform: New Platform</legend>
+                <div class="form-group">
+                    <label>Platform Name:</label>
+                    <input type="text" name="platform-name[]" placeholder="Platform Name" required>
+                </div>
+                <div class="sensor-group-container">
+                    <div class="sensor-group" data-sensor-index="0">
+                        <input type="text" name="sensor-name-${platformIndex}[]" placeholder="Sensor Name" required>
+                        <input type="text" name="sensor-ip-${platformIndex}[]" placeholder="IP" required>
+                        <input type="number" name="sensor-port-${platformIndex}[]" placeholder="Port" required>
+                        <button type="button" class="remove-button" onclick="removeSensor(this)">Remove Sensor</button>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="add-sensor-button" onclick="addSensor(this)">Add Sensor</button>
+                    <button type="button" class="remove-button" onclick="removePlatform(this)">Remove Platform</button>
+                </div>
+            </fieldset>
+        `;
+        platformsContainer.appendChild(newPlatformContainer);
+    }
+</script>
+
+{% endblock %}
+

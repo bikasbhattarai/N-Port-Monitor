@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Port Monitoring System: Norwegian Meteorological Institute</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* Existing styles for station cards */
+        .station-card {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-align: center;
+        }
+
+        .station-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .station-card h3 {
+            margin-top: 0;
+        }
+
+        /* Add Station Card specific styles */
+        .add-station-card {
+            cursor: default; /* Prevent pointer cursor */
+        }
+
+        .add-station-card h3 {
+            margin-top: 0;
+            font-size: 20px;
+            color: #007bff;
+        }
+
+        .add-station-card a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+
+        .add-station-card a:hover {
+            background-color: #0056b3;
+        }
+
+        /* Adding the button class styles */
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <img src="{{ url_for('static', filename='Met_logo.png') }}" alt="Logo" class="logo">
+            <h1>Port Monitoring System</h1>
+            <h2>Norwegian Meteorological Institute</h2>
+        </div>
+        <nav>
+            <ul>
+                <!-- Home button is removed from here -->
+            </ul>
+        </nav>
+    </header>
+    
+    <main>
+        <section class="welcome">
+            <h2>Welcome to the Port Monitoring System</h2>
+            <p>Select a station to view its monitoring data:</p>
+        </section>
+        
+        <section class="stations-grid">
+            {% if stations %}
+                {% for station_name in stations %}
+                <div class="station-card">
+                    <h3>{{ station_name }}</h3>
+                    <a href="{{ url_for('station', name=station_name) }}" class="button">View Monitoring Data</a>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>No stations available.</p>
+            {% endif %}
+            
+            <!-- Add Station card -->
+            <div class="station-card add-station-card">
+                <h3>Add Station</h3>
+                <a href="{{ url_for('add_station_page') }}" class="button">Create</a>
+            </div>
+        </section>
+    </main>
+    
+    <footer>
+        <p>&copy; bikascb@met.no, 2024 Norwegian Meteorological Institute. All rights reserved.</p>
+    </footer>
+</body>
+</html>
+
