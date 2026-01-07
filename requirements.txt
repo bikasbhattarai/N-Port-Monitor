@@ -1,0 +1,23 @@
+# N-Port Monitor Dependencies
+# Install with: pip install -r requirements.txt
+
+# Web Framework
+Flask>=2.0.0
+
+# Environment Management
+python-dotenv>=1.0.0
+
+# Development Dependencies (optional)
+pytest>=7.0.0
+flake8>=6.0.0
+
+# Note: The following are part of Python standard library:
+# - sqlite3
+# - json
+# - socket
+# - threading
+# - concurrent.futures
+# - logging
+# - os
+# - time
+# - urllib.parse
