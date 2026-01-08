@@ -1,175 +1,64 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ station_name }} Monitoring{% endblock %}
+{% block title %}{{ station_name }} - N-Port Monitor{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<meta http-equiv="refresh" content="20">
+{% endblock %}
 
 {% block content %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Port Monitor</title>
-    <meta http-equiv="refresh" content="20"> <!-- Refresh every 20 seconds -->
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background-color: #007bff;
-            color: white;
-            padding: 0px;
-            text-align: center;
-            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            margin: 0;
-            font-size: 24px;
-            font-weight: normal;
-        }
-        .header-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .button {
-            padding: 10px 20px;
-            border: none;
-            background-color: #007bff;
-            color: white;
-            text-decoration: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        .button:hover {
-            background-color: #0056b3;
-        }
-        .delete-button {
-            background-color: #dc3545;
-        }
-        .delete-button:hover {
-            background-color: #c82333;
-        }
-        .inline-form {
-            display: inline-block;
-            margin: 0;
-        }
-        .container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .platform {
-            background-color: white;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 15px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .platform:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #007bff;
-            color: white;
-            text-transform: uppercase;
-            font-size: 14px;
-        }
-        td {
-            border-bottom: 1px solid #ddd;
-            font-size: 14px;
-        }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        tr:hover {
-            background-color: #f1f1f1;
-        }
-        .status {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .status.green {
-            background-color: #28a745;
-        }
-        .status.red {
-            background-color: #dc3545;
-        }
-        .status.unknown {
-            background-color: #6c757d;
-        }
-        .status:hover {
-            transform: scale(1.2);
-        }
-        #chart-container {
-            display: none; /* Hide by default */
-            width: 80%;
-            height: 400px;
-            margin: 30px auto;
-            position: relative;
-        }
-        #close-chart {
-            position: absolute;
-            top: -10px;
-            right: -10px;
-            cursor: pointer;
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 50%;
-            font-size: 16px;
-        }
-        footer {
-            background-color: #f8f9fa;
-            text-align: center;
-            padding: 10px 0;
-            margin-top: 20px;
-            font-size: 14px;
-            color: #6c757d;
-        }
-    </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Include Chart.js -->
-</head>
-<body>
-    <header>
-        <h1>Port Monitor Dashboard</h1>
-        <div class="header-buttons">
-            <a href="{{ url_for('index') }}" class="button">Home</a>
-            <a href="{{ url_for('edit_station', name=station_name) }}" class="button">Edit Station</a>
-            <form action="{{ url_for('delete_station_view', name=station_name) }}" method="post" class="inline-form">
-                <button type="submit" class="button delete-button">Delete Station</button>
-            </form>
-        </div>
-    </header>
+<section class="station-header">
+    <div class="station-title">
+        <a href="{{ url_for('index') }}" class="back-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            Back to Stations
+        </a>
+        <h2>{{ station_name }}</h2>
+        <p class="station-subtitle">Real-time sensor monitoring dashboard</p>
+    </div>
+    <div class="station-actions">
+        <a href="{{ url_for('edit_station', name=station_name) }}" class="btn btn-secondary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+            Edit
+        </a>
+        <form action="{{ url_for('delete_station_route', name=station_name) }}" method="post" class="inline-form" onsubmit="return confirm('Are you sure you want to delete this station? This action cannot be undone.');">
+            <button type="submit" class="btn btn-danger">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                Delete
+            </button>
+        </form>
+    </div>
+</section>
 
-    <div class="container">
-        {% for platform_name, sensors in platforms.items() %}
-        <div class="platform">
-            <h2>{{ platform_name }}</h2>
-            <table>
+<section class="status-legend">
+    <span class="legend-item">
+        <span class="status-dot green"></span> Receiving Data
+    </span>
+    <span class="legend-item">
+        <span class="status-dot red"></span> No Data / Error
+    </span>
+    <span class="legend-item">
+        <span class="status-dot unknown"></span> Unknown
+    </span>
+    <span class="legend-item refresh-note">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+        Auto-refresh: 20s
+    </span>
+</section>
+
+<section class="platforms-grid">
+    {% for platform_name, sensors in platforms.items() %}
+    <article class="platform-card">
+        <header class="platform-header">
+            <h3>{{ platform_name }}</h3>
+            <span class="sensor-count">{{ sensors|length }} sensor{% if sensors|length != 1 %}s{% endif %}</span>
+        </header>
+        <div class="sensor-table-wrapper">
+            <table class="sensor-table">
                 <thead>
                     <tr>
-                        <th>Sensor Name</th>
+                        <th>Sensor</th>
                         <th>IP Address</th>
                         <th>Port</th>
                         <th>Status</th>
@@ -178,83 +67,159 @@
                 <tbody>
                     {% for sensor in sensors %}
                     <tr>
-                        <td>{{ sensor.sensor_name }}</td>
-                        <td>{{ sensor.ip }}</td>
-                        <td>{{ sensor.port }}</td>
-                        <td>
-                            <div class="status {{ sensor.status }}" 
-                                 onclick="showChart('{{ platform_name }}', '{{ sensor.sensor_name }}')"></div>
+                        <td class="sensor-name">{{ sensor.sensor_name }}</td>
+                        <td class="sensor-ip"><code>{{ sensor.ip }}</code></td>
+                        <td class="sensor-port"><code>{{ sensor.port }}</code></td>
+                        <td class="sensor-status">
+                            <button 
+                                class="status-indicator {{ sensor.status }}"
+                                onclick="showChart('{{ platform_name }}', '{{ sensor.sensor_name }}')"
+                                title="Click to view history"
+                                aria-label="View history for {{ sensor.sensor_name }}"
+                            >
+                                <span class="status-dot {{ sensor.status }}"></span>
+                                <span class="status-text">{{ sensor.status | capitalize }}</span>
+                            </button>
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
-        {% endfor %}
+    </article>
+    {% endfor %}
+</section>
+
+<!-- Chart Modal -->
+<div id="chart-modal" class="modal" onclick="closeChart(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <header class="modal-header">
+            <h3 id="chart-title">Sensor History</h3>
+            <button class="modal-close" onclick="closeChart()" aria-label="Close">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </header>
+        <div class="chart-container">
+            <canvas id="statusChart"></canvas>
+        </div>
+        <p class="chart-legend">0 = OK (green), 1 = Failed (red)</p>
     </div>
-    <!-- Container for the chart -->
-    <div id="chart-container">
-        <button id="close-chart" onclick="closeChart()">X</button>
-        <canvas id="statusChart"></canvas>
-    </div>
+</div>
+{% endblock %}
 
-    <footer>
-        © bikascb@met.no 2024 Port Monitor | All rights reserved.
-    </footer>
-
-    <script>
-        function showChart(platformName, sensorName) {
-            fetch(`/history/${platformName}/${sensorName}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (!Array.isArray(data) || data.length === 0) {
-                        throw new Error('Data is not in expected format or is empty');
-                    }
-
-                    const ctx = document.getElementById('statusChart').getContext('2d');
-                    new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: Array.from({ length: data.length }, (_, i) => i + 1),
-                            datasets: [{
-                                label: `${sensorName} Status`,
-                                data: data,
-                                borderColor: 'rgb(255, 99, 132)',
-                                fill: false,
-                                stepped: true,
-                            }]
-                        },
-                        options: {
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    ticks: {
-                                        stepSize: 1,
-                                        callback: function(value) { return value === 0 ? 'OK' : 'Failed'; }
+{% block extra_scripts %}
+<script>
+    let chartInstance = null;
+    
+    function showChart(platformName, sensorName) {
+        const encodedPlatform = encodeURIComponent(platformName);
+        const encodedSensor = encodeURIComponent(sensorName);
+        
+        fetch(`/api/history/${encodedPlatform}/${encodedSensor}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!Array.isArray(data)) {
+                    throw new Error('Invalid data format');
+                }
+                
+                // Destroy existing chart
+                if (chartInstance) {
+                    chartInstance.destroy();
+                }
+                
+                // Update title
+                document.getElementById('chart-title').textContent = `${sensorName} - Status History`;
+                
+                // Create new chart
+                const ctx = document.getElementById('statusChart').getContext('2d');
+                chartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: Array.from({ length: data.length }, (_, i) => i + 1),
+                        datasets: [{
+                            label: 'Status',
+                            data: data,
+                            borderColor: 'rgb(99, 102, 241)',
+                            backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                            fill: true,
+                            stepped: true,
+                            pointRadius: 3,
+                            pointHoverRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.raw === 0 ? 'OK' : 'Failed';
                                     }
                                 }
                             }
+                        },
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Check Number'
+                                },
+                                grid: {
+                                    display: false
+                                }
+                            },
+                            y: {
+                                min: -0.1,
+                                max: 1.1,
+                                ticks: {
+                                    stepSize: 1,
+                                    callback: function(value) {
+                                        if (value === 0) return 'OK';
+                                        if (value === 1) return 'Failed';
+                                        return '';
+                                    }
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Status'
+                                }
+                            }
                         }
-                    });
-
-                    document.getElementById('chart-container').style.display = 'block';
-                })
-                .catch(error => {
-                    console.error('There was an error with the chart:', error);
-                    alert('Failed to load chart. Please check console for details.');
+                    }
                 });
+                
+                // Show modal
+                document.getElementById('chart-modal').classList.add('active');
+                document.body.style.overflow = 'hidden';
+            })
+            .catch(error => {
+                console.error('Error loading chart:', error);
+                alert('Failed to load history data. The sensor may not have any recorded history yet.');
+            });
+    }
+    
+    function closeChart(event) {
+        if (event && event.target !== document.getElementById('chart-modal')) {
+            return;
         }
-
-        function closeChart() {
-            document.getElementById('chart-container').style.display = 'none';
+        document.getElementById('chart-modal').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    // Close on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeChart();
         }
-    </script>
-</body>
-</html>
+    });
+</script>
 {% endblock %}
-
